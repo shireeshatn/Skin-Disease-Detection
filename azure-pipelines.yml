@@ -26,11 +26,11 @@ steps:
 
     echo "Adding Azure DevOps repository as a remote"
     # git remote add azure https://Sthyaranahallin9911@dev.azure.com/Sthyaranahallin9911/Skin%20Disease%20Detection/_git/Skin%20Disease%20Detection
-    git remote add azure https://$(AZURE_DEVOPS_PAT)@dev.azure.com/Sthyaranahallin9911/Skin%20Disease%20Detection/_git/Skin%20Disease%20Detection
+    git remote add azure https://$(Azure_Devops_Pat)@dev.azure.com/Sthyaranahallin9911/Skin%20Disease%20Detection/_git/Skin%20Disease%20Detection
 
     echo "Pushing changes to Azure DevOps repository"
     git push azure main  # or the appropriate branch
 
   displayName: 'Sync GitHub to Azure DevOps'
   env:
-    AZURE_DEVOPS_PAT: $(AzureDevops.PAT)
+    Azure_Devops_Pat: $(Azure_Devops_Pat)
