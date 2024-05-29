@@ -1,0 +1,35 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+
+steps:
+- checkout: self
+  clean: true
+
+- script: |
+    echo "Setting up Git configurations"
+    git config --global user.email "Sthyaranahallin9911@conestoga.on.ca"
+    git config --global user.name "Shireesha TN"
+
+    echo "Cloning the GitHub repository"
+    git clone https://github.com/shireeshatn/Skin-Disease-Detection.git
+
+    cd Skin-Disease-Detection
+
+    echo "Adding Azure DevOps repository as a remote"
+    git remote add azure https://$(Azure_Devops_Pat)@dev.azure.com/Sthyaranahallin9911/Skin%20Disease%20Detection/_git/Skin%20Disease%20Detection
+
+    echo "Pushing changes to Azure DevOps repository"
+    git push azure main  # or the appropriate branch
+
+  displayName: 'Sync GitHub to Azure DevOps'
+  env:
+    Azure_Devops_Pat: $(Azure_Devops_Pat)
