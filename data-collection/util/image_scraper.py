@@ -9,7 +9,7 @@ import requests
 base_url = 'https://dermnetnz.org'
 
 # Read URLs from the text file
-with open('href_values.txt', 'r') as file:
+with open('data-collection/disease_links.txt', 'r') as file:
     relative_urls = [line.strip() for line in file]
 
 async def download_image(image_url, folder):
