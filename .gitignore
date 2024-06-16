@@ -2,3 +2,4 @@ data-collection/dataset/
 dev/skin_disease_detection_model.h5
 helper.py
 yolov5s.pt
+dev/best_model.h5
