@@ -1,21 +1,17 @@
-let uploadButton = document.getElementById
-  ("upload");
-let chosenImage = document.getElementById
-  ("chosen-image");
+let uploadButton = document.getElementById("upload");
+let chosenImage = document.getElementById("chosen-image");
 var resultContainer = document.getElementById('result-container');
 
-
-resultContainer.style.display = "none"
+resultContainer.style.display = "none";
 uploadButton.onchange = () => {
   let reader = new FileReader();
   reader.readAsDataURL(uploadButton.files[0]);
   reader.onload = () => {
     chosenImage.setAttribute("src", reader.result);
+  };
+};
 
-  }
-}
-
-hideLoadingSpinner()
+hideLoadingSpinner();
 
 function showLoadingSpinner() {
   var spinner = document.getElementById('loading-spinner');
@@ -34,10 +30,8 @@ function displayResponse(response) {
     display: flex;
     flex-direction: column;
     background-color: transparent;
-    /* Add more styles here */
-`;
-  resultContainer.style.marginTop = "22px"
-  // Clear the container
+  `;
+  resultContainer.style.marginTop = "22px";
   resultContainer.innerHTML = '';
 
   // Create the disease element
@@ -80,16 +74,12 @@ function displayError(message) {
   errorContainer.style.marginTop = '55px';
   errorMessageElement.style.color = 'red';
   errorMessageElement.style.backgroundColor = 'transparent';
-
-
-
   errorMessageElement.textContent = message;
 
   // Append the <h4> element to the error container
   errorContainer.appendChild(errorMessageElement);
-
-
 }
+
 function submitForm() {
   var form = document.getElementById('uploadForm');
   var formData = new FormData(form);
@@ -105,6 +95,7 @@ function submitForm() {
   };
   xhr.send(formData);
 }
+
 function detectFunction() {
   // Show loading spinner
   showLoadingSpinner();
@@ -135,13 +126,58 @@ function detectFunction() {
       hideLoadingSpinner();
 
       var response = JSON.parse(xhr.responseText);
-
-
-      // Show an error message
       displayError('Error: ' + response.message);
       setTimeout(() => {
         displayError('');
+      }, 1000);
+    }
+  };
+  xhr.send(formData);
+}
 
+function displayProgressResponse(response) {
+  resultContainer.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    background-color: transparent;
+  `;
+  resultContainer.style.marginTop = "22px";
+  resultContainer.innerHTML = '';
+
+  var predictedClassElement = document.createElement('p');
+  predictedClassElement.textContent = 'Predicted Class: ' + response.predicted_class;
+  predictedClassElement.style.color = 'white';
+  predictedClassElement.style.marginTop = '7px';
+
+  var severityElement = document.createElement('p');
+  severityElement.textContent = 'Severity: ' + response.severity;
+  severityElement.style.color = 'white';
+  severityElement.style.marginTop = '7px';
+
+  resultContainer.appendChild(predictedClassElement);
+  resultContainer.appendChild(severityElement);
+}
+
+function trackProgress() {
+  showLoadingSpinner();
+  var form = document.getElementById('uploadForm');
+  var fileInput = document.getElementById('upload');
+  var formData = new FormData();
+  formData.append('file', fileInput.files[0]);
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/progress', true);
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      hideLoadingSpinner();
+      var response = JSON.parse(xhr.responseText);
+      displayProgressResponse(response);
+    } else {
+      hideLoadingSpinner();
+      var response = JSON.parse(xhr.responseText);
+      displayError('Error: ' + response.message);
+      setTimeout(() => {
+        displayError('');
       }, 1000);
     }
   };
