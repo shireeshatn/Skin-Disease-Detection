@@ -2,6 +2,7 @@ import io
 import json
 
 from flask import Flask, jsonify, make_response, render_template, request
+from MyNet import MyNet
 from PIL import Image
 from predict import predict_disease
 from progress_tracking import predict_acne_severity
@@ -76,3 +77,4 @@ def progress_tracking():
 
 if __name__ == "__main__":
     app.run(debug=True, port=3000)
+

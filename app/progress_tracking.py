@@ -1,5 +1,5 @@
-import matplotlib.pyplot as plt
 import torch
+# import torchvision
 from PIL import Image
 from torchvision import transforms
 
@@ -7,12 +7,25 @@ from torchvision import transforms
 mean = (0.5, 0.5, 0.5)
 std = (0.5, 0.5, 0.5)
 
-# Define the transformation pipeline
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
+    transforms.RandomHorizontalFlip(p=0.5),  # Randomly flip images left-right
+    transforms.RandomVerticalFlip(p=0.5),
+    transforms.RandomRotation(degrees=15),
+    transforms.ElasticTransform(),
     transforms.ToTensor(),
-    transforms.Normalize(mean, std)
-])
+    transforms.Normalize(mean, std)])
+
+# Define the transformation pipeline
+# transform = transforms.Compose([
+#     transforms.Resize((224, 224)),
+#     transforms.ToTensor(),
+#     transforms.Normalize(mean, std)
+# ])
+
+# Load the pre-trained model
+model = torch.load('best.pt')
+model.eval()  # Set the model to evaluation mode
 
 # Function to load and preprocess the image
 def load_image(image_path):
@@ -24,10 +37,6 @@ def predict_acne_severity(image_path):
     try:
         # Load and preprocess the image
         image_tensor = load_image(image_path)
-
-        # Load the pre-trained model
-        model = torch.load('best.pt', map_location=torch.device('cpu'))  # Load model to CPU
-        model.eval()  # Set the model to evaluation mode
 
         # Perform the prediction
         with torch.no_grad():  # No need to calculate gradients for inference
