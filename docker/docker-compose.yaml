@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  skin-disease-detection:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    image: skin-disease-detection:latest
+    ports:
+      - "8000:3000"
