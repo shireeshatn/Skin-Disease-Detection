@@ -15,7 +15,7 @@ def load_and_preprocess_image(img_path, target_size=(224, 224)):
 
 def predict_disease(img_path):
     # Load the trained model
-    model = load_model('best_model.h5')
+    model = load_model('models/skin-disease-detection-model.h5')
 
     # Load and preprocess the image
     img = load_and_preprocess_image(img_path)

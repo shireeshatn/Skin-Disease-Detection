@@ -24,7 +24,7 @@ transform = transforms.Compose([
 # ])
 
 # Load the pre-trained model
-model = torch.load('best.pt')
+model = torch.load('models/acne-tracking-model.pt')
 model.eval()  # Set the model to evaluation mode
 
 # Function to load and preprocess the image

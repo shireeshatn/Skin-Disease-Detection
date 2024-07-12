@@ -1,10 +1,5 @@
-dev/skin_disease_detection_model.h5
 helper.py
-yolov5s.pt
-dev/best_model.h5
-dev/best_model_1.h5
 dev/no_tta_prob.npy
-dev/best.pt
-app/best_model.h5
-app/best.pt
 app/__pycache__
+dev/__pycache__
+app/models/*
