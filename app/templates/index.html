@@ -1,32 +1,82 @@
+<!-- index.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.png') }}">
-    <title>AI-Powered Skin Disease Detection</title>
-    <meta name="description" content="Skin Disease detection and treatment management susceptibility by AI">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-    <!-- CSS Stylesheets -->
-    <link rel="stylesheet" href="/static/css/index.css">
-    <link rel="stylesheet" href="/static/css/styles.css">
-
-    <!-- JavaScript -->
-    <script src="/static/js/main.js"></script>
+    <title>Welcome to DermAI</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 </head>
 
 <body>
-    <div class="upper">
-        <img src="/static/images/app.png">
-        <p>AI-Powered Skin Disease Detection</p>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">
+            <img src="{{ url_for('static', filename='images/icon.png') }}" alt="DermAI Logo" class="navbar-logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('signup') }}">Sign Up</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1>Welcome to DermAI</h1>
+        <p>Your goto skin condition detector.</p>
+
+        <div id="thumbnails" class="thumbnails">
+            <div class="thumbnail" id="detect-condition">
+                <img src="{{ url_for('static', filename='images/detect.jpg') }}" alt="Detect Condition">
+                <p>Detect Condition</p>
+            </div>
+            <div class="thumbnail" id="track-condition">
+                <img src="{{ url_for('static', filename='images/track.jpg') }}" alt="Track Condition">
+                <p>Track Condition</p>
+            </div>
+        </div>
+
+        <div id="backButton" class="div-with-gap" hidden>
+            <button id="back-button" class="btn btn-secondary btn-arrow"></button>
+        </div>
+
+        <div id="upload-section" class="upload-section" hidden>
+            <form id="upload-form" enctype="multipart/form-data">
+                <input type="file" name="image" id="imageUpload">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+            <div id="result" class="result" hidden>
+                <div id="loading-spinner" class="spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>detecting ...</p>
+                </div>
+                <!-- Result will be displayed here -->
+            </div>
+        </div>
     </div>
 
-    <div>
-        <button onclick="location.href='/signin';"> Get started</button>
-    </div>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </body>
 

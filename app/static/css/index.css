@@ -1,58 +1,61 @@
-* {
-    margin: 0;
-    padding: 0;
-  }
-  
-  body {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    background: #05b2dede;
-    font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  button {
-    background-color: #274cc3;
-    border: none;
-    border-radius: 8px;
-    color: #fff;
-    font-size: 18px;
-    padding: 15px 51px;
-    cursor: pointer;
-    text-align: center;
-    cursor: pointer;
-    opacity: 0.8;
-  }
-  
-  .upper {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding-top: 3rem;
-  }
-  .upper img {
-    height: 444px;
-    margin-top: 15x;
-    width: auto;
-    align-self: center;
-  }
-  
-  .upper p {
-    color: #edf1f2;
-    font-size: 28px;
-    width: 80%;
-    text-align: center;
-    align-self: center;
-    margin-top: 1rem;
-    margin-bottom: 3rem;
-    line-height: 2rem;
-  }
-  button:hover {
-    opacity: 1;
-  }
-  
+/* static/css/index.css */
+
+/* Thumbnails Section */
+.thumbnails {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.thumbnail {
+  width: 300px;
+  height: 300px;
+  margin: 20px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.thumbnail img {
+  width: 100%;
+  height: 80%;
+  object-fit: cover;
+}
+
+.thumbnail p {
+  margin: 0;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  font-size: 1.2em;
+}
+
+.thumbnail:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.upload-section {
+  text-align: center;
+  padding: 50px;
+  border: 2px dashed #007bff;
+  border-radius: 10px;
+  background-color: white;
+}
+
+#upload-form {
+  margin-bottom: 20px;
+}
+
+.result {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #007bff;
+  border-radius: 10px;
+  background-color: #f0f8ff;
+}

@@ -1,79 +1,190 @@
-import io
-import json
+# app.py
 
-from flask import Flask, jsonify, make_response, render_template, request
-from MyNet import MyNet
-from PIL import Image
-from predict import predict_disease
-from progress_tracking import predict_acne_severity
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from datetime import datetime
+import os
 
+# Initialize Flask application
 app = Flask(__name__)
+app.config.from_object('config.Config')
 
+# Initialize the database
+db = SQLAlchemy(app)
+
+# MyNet class for acne progress tracking model
+import torch.nn as nn
+import torchvision
+
+# Database models
+class User(db.Model):
+    user_id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+    is_guest = db.Column(db.Boolean, default=False)
+
+    def __repr__(self):
+        return '<User %r>' % self.username
+
+class AcneProgress(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)  # Corrected foreign key reference
+    acne_level = db.Column(db.Integer, nullable=False)
+    date_recorded = db.Column(db.DateTime, nullable=False)
+
+    user = db.relationship('User', backref=db.backref('acne_progress', lazy=True))  # Optional: add relationship for easy access
+
+class MyNet(nn.Module):
+    def _init_(self):
+        super(MyNet, self)._init_()
+
+        self.cnn = torchvision.models.efficientnet_v2_m(pretrained=True).cuda()
+        for param in self.cnn.parameters():
+            param.requires_grad = True
+        self.cnn.classifier = nn.Sequential(
+
+        nn.Linear(self.cnn.classifier[1].in_features, 512),
+        nn.Dropout(p=0.2),
+        nn.ReLU(),
+        nn.Linear(512, 128),
+        nn.Dropout(p=0.2),
+        nn.Linear(128, 64),
+        nn.Linear(64, 4),
+       )
+
+    def forward(self, img):
+        output = self.cnn(img)
+        return output
+
+# Function to load and preprocess the image for skin disease detection
+from skin_disease_detection import predict_disease
+
+# Function to predict acne severity
+from acne_severity_classifier import predict_acne_severity
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}  # Allowed file extensions
+
+# Function to check if the filename has an allowed extension
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Routes for the application
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/signin')
-def signin():
-    return render_template('signin.html')
+@app.route('/check_login', methods=['GET'])
+def check_login():
+    if 'logged_in' in session:
+        return {'logged_in': session['logged_in']}
+    else:
+        return {'logged_in': False}
 
-@app.route('/signup')
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if 'logged_in' in session and session['logged_in']:
+        return render_template('index.html')
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            session['user_id'] = user.user_id
+            session['logged_in'] = True
+            return redirect(url_for('index'))
+        
+        session['logged_in'] = False
+        return render_template('login.html', error='Invalid username or password.')
+    
+    return render_template('login.html')
+
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+        new_user = User(username=username, password=hashed_password)
+        
+        db.session.add(new_user)
+        db.session.commit()
+        
+        # Check if login successful message should be displayed
+
+        return redirect(url_for('login'))
+    
     return render_template('signup.html')
 
-@app.route('/detect', methods=['GET', 'POST'])
-def detect():
-    if request.method == 'POST':
-        try:
-            file = request.files['file']
-        except KeyError:
-            return make_response(jsonify({
-                'error': 'No file part in the request',
-                'code': 'FILE',
-                'message': 'file is not valid'
-            }), 400)
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    session['logged_in'] = False
+    return redirect(url_for('index'))
 
-        image_pil = Image.open(io.BytesIO(file.read()))
-        image_bytes_io = io.BytesIO()
-        image_pil.save(image_bytes_io, format='JPEG')
-        image_bytes_io.seek(0)
-        path = image_bytes_io
-
-        response = predict_disease(path)
-        response["img_path"] = file.filename
-
-        print(f"Final response: {response}")
-        return make_response(jsonify(response), 200)
+@app.route('/detect_disease', methods=['POST'])
+def detect_disease():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image found'})
+    
+    file = request.files['image']
+    
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'})
+    
+    if file and allowed_file(file.filename):
+        # Save the file to a temporary location
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.root_path, 'static', 'uploads', filename)
+        file.save(file_path)
+        
+        # Perform skin disease detection
+        result = predict_disease(file_path)
+        
+        # Remove the temporary file
+        os.remove(file_path)
+        return jsonify({'disease_name': result['disease'], 'probability': result['prediction']})
     else:
-        return render_template('detect.html')
+        return jsonify({'error': 'File type not allowed'})
 
+@app.route('/track_acne', methods=['POST'])
+def track_acne():
+    if 'file' not in request.files:
+        return redirect(request.url)
+    
+    file = request.files['file']
+    
+    if file.filename == '':
+        return redirect(request.url)
+    
+    # Save the file to a temporary location
+    file_path = os.path.join(app.root_path, 'static', 'uploads', file.filename)
+    file.save(file_path)
+    
+    # Perform acne severity prediction
+    result = predict_acne_severity(file_path)
+    
+    # Record acne progress if user logged in
+    if 'user_id' in session:
+        user_id = session['user_id']
+        acne_level = result['predicted_class']  # Adjust as per model output
+        
+        # Save to database
+        new_progress = AcneProgress(user_id=user_id, acne_level=acne_level, date_recorded=datetime.now())
+        db.session.add(new_progress)
+        db.session.commit()
+    
+    # Remove the temporary file
+    os.remove(file_path)
+    
+    return render_template('result.html', result=result)
 
-@app.route('/progress', methods=['GET', 'POST'])
-def progress_tracking():
-    if request.method == 'POST':
-        try:
-            file = request.files['file']
-        except KeyError:
-            return make_response(jsonify({
-                'error': 'No file part in the request',
-                'code': 'FILE',
-                'message': 'file is not valid'
-            }), 400)
-
-        image_pil = Image.open(io.BytesIO(file.read()))
-        image_bytes_io = io.BytesIO()
-        image_pil.save(image_bytes_io, format='JPEG')
-        image_bytes_io.seek(0)
-        path = image_bytes_io
-
-        response = predict_acne_severity(path)
-        response["img_path"] = file.filename
-
-        print(f"Final response: {response}")
-        return make_response(jsonify(response), 200)
-    else:
-        return render_template('detect.html')
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=3000)
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)

@@ -1,5 +1,4 @@
 import torch
-# import torchvision
 from PIL import Image
 from torchvision import transforms
 
@@ -9,19 +8,9 @@ std = (0.5, 0.5, 0.5)
 
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
-    transforms.RandomHorizontalFlip(p=0.5),  # Randomly flip images left-right
-    transforms.RandomVerticalFlip(p=0.5),
-    transforms.RandomRotation(degrees=15),
-    transforms.ElasticTransform(),
     transforms.ToTensor(),
-    transforms.Normalize(mean, std)])
-
-# Define the transformation pipeline
-# transform = transforms.Compose([
-#     transforms.Resize((224, 224)),
-#     transforms.ToTensor(),
-#     transforms.Normalize(mean, std)
-# ])
+    transforms.Normalize(mean, std)
+])
 
 # Load the pre-trained model
 model = torch.load('models/acne-tracking-model.pt')
@@ -50,11 +39,7 @@ def predict_acne_severity(image_path):
         severity_labels = ['Mild', 'Moderate', 'Severe', 'Very Severe']
         severity_label = severity_labels[predicted_class]
 
-        print(f"Predicted class: {predicted_class}")
-        print(f"Acne severity: {severity_label}")
-
         return {'predicted_class': predicted_class, 'severity': severity_label}
 
     except Exception as e:
         return {'error': str(e)}
-

@@ -1,4 +1,4 @@
-<!-- signup.html -->
+<!-- login.html -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - DermAI</title>
+    <title>Login - DermAI</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
@@ -21,8 +21,13 @@
     </nav>
 
     <div class="center">
-        <h1>Sign Up</h1>
-        <form method="POST" action="{{ url_for('signup') }}">
+        <h1>Login</h1>
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endif %}
+        <form method="POST" action="{{ url_for('login') }}">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
@@ -33,9 +38,9 @@
                     required>
             </div>
             <div class="btn_div">
-                <button type="submit" class="btn btn-primary">Sign Up</button>
+                <button type="submit" class="btn btn-primary">Login</button>
                 <div class="signup_link">
-                    <p>Already have an account? <a href="{{ url_for('login') }}">Login Here</a>.</p>
+                    <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign Up Here</a>.</p>
                 </div>
             </div>
         </form>
@@ -43,6 +48,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 
 </html>
