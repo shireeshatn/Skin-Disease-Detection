@@ -11,6 +11,7 @@ def load_and_preprocess_image(img_path, target_size=(224, 224)):
     img = image.load_img(img_path, target_size=target_size)
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+    img_array = img_array / 255.0 # Rescale
     return img_array
 
 # Function to predict skin disease
@@ -23,11 +24,17 @@ def predict_disease(img_path):
 
     # Predict the class probabilities
     predictions = model.predict(img)
-    pred = np.argmax(predictions)
+    top_5_preds = np.argsort(predictions[0])[:5]
 
     response = {
-        "disease": class_names[pred],
-        "prediction": str(round(predictions[0][pred], 2))
+        "diseases": class_names[top_5_preds[0]] + ',' + class_names[top_5_preds[1]] + 
+                     ',' + class_names[top_5_preds[2]] + ',' + class_names[top_5_preds[3]] + 
+                     ',' + class_names[top_5_preds[4]],
+        "predictions": str(round(predictions[0][top_5_preds[0]], 2)) + ','
+                       + str(round(predictions[0][top_5_preds[1]], 2)) + ','
+                       + str(round(predictions[0][top_5_preds[2]], 2)) + ','
+                       + str(round(predictions[0][top_5_preds[3]], 2)) + ','
+                       + str(round(predictions[0][top_5_preds[4]], 2))
     }
 
     return response

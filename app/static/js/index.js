@@ -56,12 +56,20 @@ $(document).ready(function () {
                 if (response['error']) {
                     $('#result').html('<p style="color: red;">Error: ' + response['error'] + '</p>').fadeIn(500).attr('hidden', false);
                 } else {
-                    // Example: Display response['message'] as a JSON table
-                    var messageHtml = '<p>' + JSON.stringify(response, null, 2) + '</p>';
+                    console.log(response)
+                    const diseases = response['disease_names'].split(',')
+                    const predictions = response['probabilities'].split(',')
+                    var messageHtml = ''
+
+                    for (let i = 0; i < 5; i++) {
+                        messageHtml += '<p><a href=https://dermnetnz.org/topics/' + diseases[i]
+                            + ' class=\"my-link\">' + diseases[i] + '</a>: ' + predictions[i] + '<p>';
+                    }
+
                     $('#result').html(messageHtml).fadeIn(500).attr('hidden', false);
                 }
 
-                $('#upload-section button').fadeOut(500);  // Fade out the upload button
+                $('#upload-section button').fadeOut(500);
             },
             error: function (xhr, status, error) {
                 $('#loading-spinner').attr('hidden', true);

@@ -148,7 +148,7 @@ def detect_disease():
         
         # Remove the temporary file
         os.remove(file_path)
-        return jsonify({'disease_name': result['disease'], 'probability': result['prediction']})
+        return jsonify({'disease_names': result['diseases'], 'probabilities': result['predictions']})
     else:
         return jsonify({'error': 'File type not allowed'})
 
