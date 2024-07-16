@@ -2,4 +2,3 @@ helper.py
 dev/no_tta_prob.npy
 app/__pycache__
 dev/__pycache__
-app/models/*
