@@ -6,5 +6,19 @@ services:
       context: ../
       dockerfile: docker/Dockerfile
     image: skin-disease-detection:latest
+    environment:
+      - DATABASE_URI=postgresql://group5:dermai@postgresql/dermai
     ports:
       - "8000:3000"
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    container_name: postgresql
+    environment:
+      - POSTGRES_USER=group5
+      - POSTGRES_PASSWORD=dermai
+      - POSTGRES_DB=dermai
+    ports:
+      - "5432:5432"
