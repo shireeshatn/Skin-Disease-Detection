@@ -56,7 +56,6 @@ $(document).ready(function () {
                 if (response['error']) {
                     $('#result').html('<p style="color: red;">Error: ' + response['error'] + '</p>').fadeIn(500).attr('hidden', false);
                 } else {
-                    console.log(response)
                     const diseases = response['disease_names'].split(',')
                     const predictions = response['probabilities'].split(',')
                     var messageHtml = ''
@@ -88,13 +87,15 @@ $(document).ready(function () {
                     $('#result').html('<p style="color: red;">Error: ' + response['error'] + '</p>').fadeIn(500).attr('hidden', false);
                 } else {
                     // Example: Display response['message'] as a JSON table
-                    var messageHtml = '<p>' + JSON.stringify(response, null, 2) + '</p>';
+                    const level = response['current_level']
+                    var messageHtml = '<p> Predicted Acne Level:   ' + level + '<p>';
                     $('#result').html(messageHtml).fadeIn(500).attr('hidden', false);
                 }
 
-                $('#upload-section button').fadeOut(500);  // Fade out the upload button
+                $('#upload-section button').fadeOut(500);
             },
             error: function (xhr, status, error) {
+                $('#loading-spinner').attr('hidden', true);
                 console.error('Error:', error);
                 $('#result').html('<p style="color: red;">Error: ' + error + '</p>').fadeIn(500).attr('hidden', false);
             },

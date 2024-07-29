@@ -157,10 +157,10 @@ def detect_disease():
 
 @app.route('/track_acne', methods=['POST'])
 def track_acne():
-    if 'file' not in request.files:
+    if 'image' not in request.files:
         return redirect(request.url)
 
-    file = request.files['file']
+    file = request.files['image']
 
     if file.filename == '':
         return redirect(request.url)
@@ -179,13 +179,14 @@ def track_acne():
 
         # Save to database
         new_progress = AcneProgress(user_id=user_id, acne_level=acne_level, date_recorded=datetime.now())
+        print(new_progress)
         db.session.add(new_progress)
         db.session.commit()
 
     # Remove the temporary file
     os.remove(file_path)
 
-    return render_template('result.html', result=result)
+    return jsonify({'current_level': result['severity']})
 
 if __name__ == '__main__':
     with app.app_context():
