@@ -2,23 +2,29 @@ version: '3.8'
 
 services:
   skin-disease-detection:
-    # build:
-    #   context: ../
-    #   dockerfile: docker/Dockerfile
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
     image: shireeshatn/skin-disease-detection:latest
     environment:
-      - DATABASE_URI=postgresql://group5:dermai@postgresql/dermai
+      - DATABASE_URI=${DATABASE_URI}
+      - APP_SECRET=${APP_SECRET}
     ports:
       - "3000:3000"
     depends_on:
       - db
 
   db:
-    image: postgres
+    image: postgres:latest
     container_name: postgresql
     environment:
-      - POSTGRES_USER=group5
-      - POSTGRES_PASSWORD=dermai
-      - POSTGRES_DB=dermai
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+volumes:
+  pgdata:

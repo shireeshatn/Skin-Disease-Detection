@@ -4,8 +4,7 @@ import os
 
 class Config:
     # Flask configuration
-    SECRET_KEY = 'dermai'
-
+    SECRET_KEY = os.environ.get("APP_SECRET")
     # Database configuration
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URI", 'postgresql://group5:dermai@localhost/dermai')
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URI")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
