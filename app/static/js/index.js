@@ -87,8 +87,10 @@ $(document).ready(function () {
                     $('#result').html('<p style="color: red;">Error: ' + response['error'] + '</p>').fadeIn(500).attr('hidden', false);
                 } else {
                     // Example: Display response['message'] as a JSON table
-                    const level = response['current_level']
-                    var messageHtml = '<p> Predicted Acne Level:   ' + level + '<p>';
+                    const dates = response['dates']
+                    const acne_levels = response['acne_levels']
+                    var messageHtml = '<div class=\"container\"><h1 class=\"text-center\">Acne Progress</h1>' +
+                        '<img src=\"acne_progress_plot\" alt=\"Acne Progress Plot\" class=\"img-fluid\"></div>';
                     $('#result').html(messageHtml).fadeIn(500).attr('hidden', false);
                 }
 

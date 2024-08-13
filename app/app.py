@@ -1,11 +1,15 @@
 import os
+import io
 from datetime import datetime
 
 from dotenv import load_dotenv
-from flask import Flask, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for, Response    
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
+
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 load_dotenv()
 
@@ -156,6 +160,32 @@ def detect_disease():
         return jsonify({'disease_names': result['diseases'], 'probabilities': result['predictions']})
     else:
         return jsonify({'error': 'File type not allowed'})
+    
+@app.route('/acne_progress_plot')
+def acne_progress_plot():
+    user_id = session['user_id']
+
+    # Query the data
+    progress_data = AcneProgress.query.filter_by(user_id=user_id).order_by(AcneProgress.date_recorded).all()
+
+    # Extract data for plotting
+    dates = [data.date_recorded for data in progress_data]
+    acne_levels = [data.acne_level for data in progress_data]
+
+    # Create the plot
+    fig, ax = plt.subplots()
+    ax.plot(dates, acne_levels, marker='o')
+    ax.set_title('Acne Progress Over Time')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Acne Level')
+    ax.grid(True)
+
+    # Output the plot as a PNG image
+    output = io.BytesIO()
+    plt.savefig(output, format='png')
+    output.seek(0)
+
+    return Response(output.getvalue(), mimetype='image/png')
 
 
 @app.route('/track_acne', methods=['POST'])
@@ -186,9 +216,7 @@ def track_acne():
         db.session.add(new_progress)
         db.session.commit()
 
-    # Remove the temporary file
     os.remove(file_path)
-
     return jsonify({'current_level': result['severity']})
 
 if __name__ == '__main__':
